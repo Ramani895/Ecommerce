@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ShopEase - Product Listing</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+  <!-- Google Fonts: Inter and Fira Sans -->
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* New color palette: teal, blue, orange, gray, white */
+      --primary: #008080;
+      --primary-dark: #005a5a;
+      --accent: #ff9800;
+      --accent-dark: #e65100;
+      --secondary: #1976d2;
+      --secondary-light: #e3f2fd;
+      --background: #f7fafd;
+      --surface: #ffffff;
+      --text-main: #222b2e;
+      --text-light: #6b7a86;
+      --border: #e0e6ed;
+      --success: #43a047;
+      --danger: #e53935;
+      --star: #ffb300;
+    }
+    body {
+      font-family: 'Inter', 'Fira Sans', Arial, sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, var(--background) 60%, var(--secondary-light) 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(90deg, var(--primary) 60%, var(--secondary) 100%);
+      color: var(--surface);
+      padding: 1.2rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      box-shadow: 0 2px 8px rgba(0,128,128,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      user-select: none;
+      cursor: pointer;
+      transition: transform 0.2s;
+      font-family: 'Fira Sans', 'Inter', Arial, sans-serif;
+    }
+    .logo:active {
+      transform: scale(0.97) rotate(-2deg);
+    }
+
+    .logo i {
+      color: var(--accent);
+      font-size: 2.2rem;
+      transition: transform 0.2s;
+    }
+    .logo:hover i {
+      transform: rotate(-15deg) scale(1.1);
+    }
+
+    header input {
+      padding: 0.7rem 1rem;
+      width: 40%;
+      border: none;
+      border-radius: 25px;
+      font-size: 1rem;
+      outline: none;
+      box-shadow: 0 2px 8px rgba(0,128,128,0.08);
+      transition: box-shadow 0.2s;
+      background: var(--surface);
+      color: var(--text-main);
+      font-family: inherit;
+    }
+    header input:focus {
+      box-shadow: 0 2px 12px rgba(0,128,128,0.18);
+    }
+
+    #cartCount {
+      background: var(--surface);
+      color: var(--primary);
+      padding: 0.4rem 1.1rem 0.4rem 0.8rem;
+      border-radius: 25px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      box-shadow: 0 2px 8px rgba(0,128,128,0.08);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.2s, color 0.2s;
+    }
+    #cartCount:hover {
+      background: var(--accent);
+      color: var(--surface);
+    }
+    #cartDropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 2.5rem;
+      background: var(--surface);
+      color: var(--text-main);
+      min-width: 220px;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,128,128,0.15);
+      z-index: 100;
+      padding: 1rem;
+    }
+    #cartDropdown.active {
+      display: block;
+      animation: fadeIn 0.2s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    .cart-item {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      margin-bottom: 0.7rem;
+    }
+    .cart-item:last-child {
+      margin-bottom: 0;
+    }
+    .cart-item img {
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+    }
+    .cart-item-details {
+      flex: 1;
+    }
+    .cart-item-remove {
+      color: var(--danger);
+      cursor: pointer;
+      font-size: 1.1rem;
+      margin-left: 0.5rem;
+    }
+    .cart-empty {
+      text-align: center;
+      color: var(--text-light);
+      font-size: 1rem;
+    }
+    .cart-total {
+      font-weight: 700;
+      margin-top: 0.7rem;
+      text-align: right;
+      color: var(--primary);
+    }
+    .cart-checkout-btn {
+      margin-top: 1rem;
+      width: 100%;
+      padding: 0.6rem 0;
+      background: linear-gradient(90deg, var(--primary) 60%, var(--accent) 100%);
+      color: var(--surface);
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-family: inherit;
+    }
+    .cart-checkout-btn:hover {
+      background: linear-gradient(90deg, var(--accent) 60%, var(--primary) 100%);
+    }
+
+    .filters {
+      display: flex;
+      justify-content: space-around;
+      background: var(--surface);
+      padding: 1.2rem 2rem;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+      box-shadow: 0 2px 8px rgba(0,128,128,0.04);
+      margin-bottom: 0.5rem;
+      position: sticky;
+      top: 4.5rem;
+      z-index: 5;
+    }
+
+    .filters select, .filters input[type="range"] {
+      padding: 0.6rem 1rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--secondary-light);
+      outline: none;
+      transition: border 0.2s;
+      font-family: inherit;
+      color: var(--text-main);
+    }
+    .filters select:focus, .filters input[type="range"]:focus {
+      border: 1.5px solid var(--primary);
+    }
+    .filters label {
+      font-size: 1rem;
+      color: var(--primary);
+      margin-right: 0.5rem;
+      font-weight: 600;
+      font-family: 'Fira Sans', 'Inter', Arial, sans-serif;
+    }
+    .filters .range-value {
+      font-size: 0.95rem;
+      color: var(--text-main);
+      margin-left: 0.5rem;
+      font-weight: 700;
+    }
+
+    .filters .sort-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .filters .sort-group label {
+      margin: 0;
+      color: var(--accent);
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    .filters .sort-group select {
+      min-width: 120px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 1.5rem;
+      padding: 2rem;
+      min-height: 60vh;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0,128,128,0.10);
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 410px;
+      font-family: 'Fira Sans', 'Inter', Arial, sans-serif;
+    }
+    .card:hover {
+      transform: translateY(-6px) scale(1.03);
+      box-shadow: 0 8px 32px rgba(0,128,128,0.18);
+    }
+
+    .card-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: var(--accent);
+      color: var(--surface);
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 0.3rem 0.7rem;
+      border-radius: 12px;
+      z-index: 2;
+      box-shadow: 0 2px 8px rgba(0,128,128,0.08);
+      letter-spacing: 0.5px;
+      animation: popBadge 0.5s;
+    }
+    @keyframes popBadge {
+      0% { transform: scale(0.7); opacity: 0; }
+      80% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+
+    .card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-bottom: 1px solid var(--border);
+      transition: filter 0.2s;
+    }
+    .card:hover img {
+      filter: brightness(0.97) saturate(1.08);
+    }
+
+    .card-content {
+      padding: 1.1rem 1rem 1rem 1rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .card-content h4 {
+      margin: 0.5rem 0 0.2rem 0;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      letter-spacing: 0.2px;
+      min-height: 2.2em;
+      cursor: pointer;
+      transition: color 0.2s;
+      font-family: 'Fira Sans', 'Inter', Arial, sans-serif;
+    }
+    .card-content h4:hover {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+
+    .card-content .desc {
+      color: var(--text-light);
+      font-size: 0.98rem;
+      margin-bottom: 0.7rem;
+      min-height: 2.2em;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+
+    .card-content .price {
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .card-content .rating {
+      color: var(--star);
+      font-size: 1.05rem;
+      margin-bottom: 0.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      cursor: pointer;
+    }
+    .card-content .rating .fa-star {
+      margin-right: 2px;
+      transition: color 0.2s;
+    }
+    .card-content .rating .fa-star.selected {
+      color: var(--accent);
+    }
+
+    .card-content .category {
+      color: var(--accent);
+      font-size: 0.95rem;
+      margin-bottom: 0.3rem;
+      font-weight: 600;
+    }
+
+    .add-cart-btn {
+      margin-top: 10px;
+      padding: 8px 0;
+      background: linear-gradient(90deg, var(--primary) 60%, var(--accent) 100%);
+      color: var(--surface);
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 700;
+      transition: background 0.2s, transform 0.1s;
+      box-shadow: 0 2px 8px rgba(0,128,128,0.08);
+      letter-spacing: 0.5px;
+      font-family: inherit;
+    }
+    .add-cart-btn:active {
+      background: linear-gradient(90deg, var(--accent) 60%, var(--primary) 100%);
+      transform: scale(0.97);
+    }
+
+    .wishlist-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: var(--surface);
+      color: var(--accent);
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      box-shadow: 0 2px 8px rgba(0,128,128,0.08);
+      cursor: pointer;
+      transition: color 0.2s, background 0.2s, transform 0.1s;
+      z-index: 2;
+    }
+    .wishlist-btn.active, .wishlist-btn:hover {
+      color: var(--surface);
+      background: var(--accent);
+      transform: scale(1.1) rotate(-10deg);
+    }
+
+    /* Modal Styles */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: none;
+      background: rgba(25, 118, 210, 0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      animation: fadeIn 0.2s;
+    }
+
+    .modal-content {
+      background: var(--surface);
+      padding: 2rem 1.5rem 1.5rem 1.5rem;
+      border-radius: 14px;
+      width: 95%;
+      max-width: 430px;
+      position: relative;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,128,128,0.18);
+      animation: fadeIn 0.2s;
+      font-family: 'Fira Sans', 'Inter', Arial, sans-serif;
+    }
+
+    .modal-content img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 8px rgba(0,128,128,0.08);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 2rem;
+      cursor: pointer;
+      color: var(--accent);
+      background: var(--surface);
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, color 0.2s;
+      border: none;
+      z-index: 2;
+    }
+    .close-btn:hover {
+      background: var(--accent);
+      color: var(--surface);
+    }
+    .modal-content .modal-desc {
+      color: var(--text-light);
+      font-size: 1rem;
+      margin: 0.7rem 0 1.1rem 0;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    .modal-content .modal-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 1.2rem;
+    }
+    .modal-content .add-cart-btn, .modal-content .wishlist-btn {
+      flex: 1;
+      margin: 0;
+    }
+
+    /* Quiz Modal */
+    .quiz-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: none;
+      background: rgba(0,128,128,0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    .quiz-content {
+      background: var(--surface);
+      border-radius: 14px;
+      padding: 2rem 1.5rem;
+      max-width: 350px;
+      width: 95%;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,128,128,0.18);
+      animation: fadeIn 0.2s;
+      font-family: 'Fira Sans', 'Inter', Arial, sans-serif;
+    }
+    .quiz-content h3 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      margin-bottom: 1rem;
+    }
+    .quiz-options button {
+      background: var(--secondary-light);
+      border: 1.5px solid var(--primary);
+      color: var(--text-main);
+      border-radius: 6px;
+      padding: 0.7rem 0.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      font-family: inherit;
+      font-weight: 600;
+    }
+    .quiz-options button.selected, .quiz-options button:active {
+      background: var(--primary);
+      color: var(--surface);
+    }
+    .quiz-close-btn {
+      margin-top: 1rem;
+      background: var(--accent);
+      color: var(--surface);
+      border: none;
+      border-radius: 6px;
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-family: inherit;
+      font-weight: 700;
+    }
+    .quiz-close-btn:hover {
+      background: var(--primary);
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 2.5rem;
+      right: 2.5rem;
+      background: var(--primary);
+      color: var(--surface);
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      box-shadow: 0 2px 12px rgba(0,128,128,0.18);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 3000;
+      transition: opacity 0.3s, transform 0.3s;
+      transform: translateY(30px);
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    .toast.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    /* Confetti */
+    .confetti {
+      position: fixed;
+      pointer-events: none;
+      z-index: 3001;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      overflow: hidden;
+    }
+    .confetti-piece {
+      position: absolute;
+      width: 10px;
+      height: 18px;
+      border-radius: 3px;
+      opacity: 0.8;
+      animation: confetti-fall 2.2s linear forwards;
+    }
+    @keyframes confetti-fall {
+      0% { transform: translateY(-40px) rotate(0deg);}
+      100% { transform: translateY(100vh) rotate(360deg);}
+    }
+
+    /* Responsive */
+    @media (max-width: 700px) {
+      .filters, header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 1rem;
+      }
+      .grid {
+        padding: 1rem;
+        gap: 1rem;
+      }
+      .modal-content, .quiz-content {
+        padding: 1rem 0.5rem 1rem 0.5rem;
+      }
+      .toast {
+        right: 1rem;
+        bottom: 1rem;
+        font-size: 1rem;
+        padding: 0.7rem 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo" title="Double click for wishlist, triple click for quiz!">
+      <i class="fa-solid fa-bag-shopping"></i> ShopEase
+    </div>
+    <input type="text" id="searchInput" placeholder="Search for products, brands, categories...">
+    <div id="cartCount">
+      <i class="fa-solid fa-cart-shopping"></i>
+      <span id="cartCountNum">0</span>
+      <div id="cartDropdown"></div>
+    </div>
+  </header>
+
+  <section class="filters">
+    <div>
+      <label for="categoryFilter"><i class="fa-solid fa-layer-group"></i> Category</label>
+      <select id="categoryFilter">
+        <option value="">All</option>
+        <option value="electronics">Electronics</option>
+        <option value="fashion">Fashion</option>
+        <option value="home">Home</option>
+      </select>
+    </div>
+    <div>
+      <label for="priceFilter"><i class="fa-solid fa-indian-rupee-sign"></i> Price</label>
+      <select id="priceFilter">
+        <option value="">All</option>
+        <option value="low">Below ₹1000</option>
+        <option value="mid">₹1000 - ₹3000</option>
+        <option value="high">Above ₹3000</option>
+      </select>
+    </div>
+    <div>
+      <label for="ratingFilter"><i class="fa-solid fa-star"></i> Rating</label>
+      <select id="ratingFilter">
+        <option value="">All</option>
+        <option value="4">4★ & above</option>
+        <option value="3">3★ & above</option>
+      </select>
+    </div>
+    <div>
+      <label for="rangeFilter"><i class="fa-solid fa-sliders"></i> Max Price</label>
+      <input type="range" id="rangeFilter" min="0" max="15000" step="100" value="15000">
+      <span class="range-value" id="rangeValue">₹15000</span>
+    </div>
+    <div class="sort-group">
+      <label for="sortSelect"><i class="fa-solid fa-arrow-up-wide-short"></i> Sort</label>
+      <select id="sortSelect">
+        <option value="">Default</option>
+        <option value="price-asc">Price: Low → High</option>
+        <option value="price-desc">Price: High → Low</option>
+        <option value="rating-desc">Rating: High → Low</option>
+        <option value="name-asc">Name: A → Z</option>
+      </select>
+    </div>
+  </section>
+
+  <main id="productContainer" class="grid"></main>
+
+  <!-- Modal -->
+  <div id="productModal" class="modal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+      <img id="modalImg" src="" alt="Product Image">
+      <h3 id="modalName"></h3>
+      <div class="modal-desc" id="modalDesc"></div>
+      <p class="price" id="modalPrice"></p>
+      <p class="rating" id="modalRating"></p>
+      <p class="category" id="modalCategory"></p>
+      <div class="modal-actions">
+        <button class="add-cart-btn" id="modalAddCartBtn"><i class="fa-solid fa-cart-plus"></i> Add to Cart</button>
+        <button class="wishlist-btn" id="modalWishlistBtn"><i class="fa-regular fa-heart"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quiz Modal -->
+  <div id="quizModal" class="quiz-modal">
+    <div class="quiz-content">
+      <h3 id="quizQuestion"></h3>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div id="quizResult" style="margin-top:0.7rem;font-weight:600;"></div>
+      <button class="quiz-close-btn" onclick="closeQuiz()">Close</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <div class="confetti" id="confetti"></div>
+
+  <script>
+    // --- Product Data with more details ---
+    const products = [
+      {
+        name: "Bluetooth Speaker",
+        category: "electronics",
+        price: 999,
+        rating: 4.2,
+        img: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=400&q=80",
+        desc: "Portable wireless speaker with deep bass, 10h battery, splash-proof. Perfect for parties and travel.",
+        badge: "Best Seller",
+        brand: "SoundMax",
+        stock: 12
+      },
+      {
+        name: "Sneakers",
+        category: "fashion",
+        price: 1799,
+        rating: 3.8,
+        img: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80",
+        desc: "Trendy and comfortable sneakers for everyday wear. Breathable mesh, anti-slip sole.",
+        badge: "Trending",
+        brand: "UrbanWalk",
+        stock: 7
+      },
+      {
+        name: "LED Smart TV",
+        category: "electronics",
+        price: 12500,
+        rating: 4.6,
+        img: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80",
+        desc: "32-inch Full HD Smart TV with built-in apps, voice remote, and 2-year warranty.",
+        badge: "Limited Offer",
+        brand: "ViewPlus",
+        stock: 3
+      },
+      {
+        name: "Cushion Set",
+        category: "home",
+        price: 750,
+        rating: 4.0,
+        img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80",
+        desc: "Set of 4 soft, colorful cushions. Machine washable, perfect for living room or bedroom.",
+        badge: "Home Pick",
+        brand: "CozyNest",
+        stock: 20
+      },
+      {
+        name: "T-Shirt",
+        category: "fashion",
+        price: 499,
+        rating: 3.5,
+        img: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=400&q=80",
+        desc: "100% cotton, unisex t-shirt. Available in multiple colors and sizes.",
+        badge: "Budget Buy",
+        brand: "StyleHub",
+        stock: 30
+      },
+      {
+        name: "Vacuum Cleaner",
+        category: "home",
+        price: 2999,
+        rating: 4.3,
+        img: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80",
+        desc: "Powerful vacuum cleaner with HEPA filter, lightweight and easy to use.",
+        badge: "Top Rated",
+        brand: "CleanPro",
+        stock: 5
+      },
+      {
+        name: "Wireless Headphones",
+        category: "electronics",
+        price: 2299,
+        rating: 4.7,
+        img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80",
+        desc: "Over-ear headphones with noise cancellation, 20h battery, and quick charge.",
+        badge: "Editor's Choice",
+        brand: "AudioZen",
+        stock: 8
+      }
+    ];
+
+    // --- Quiz Data ---
+    const quizQuestions = [
+      {
+        question: "Which category are you most interested in?",
+        options: ["Electronics", "Fashion", "Home"],
+        answer: null // No right answer, for personalization
+      },
+      {
+        question: "What is your preferred price range?",
+        options: ["Below ₹1000", "₹1000 - ₹3000", "Above ₹3000"],
+        answer: null
+      },
+      {
+        question: "Which feature do you value most?",
+        options: ["Best Seller", "Trending", "Top Rated", "Budget Buy"],
+        answer: null
+      }
+    ];
+
+    // --- State ---
+    let cart = [];
+    let wishlist = [];
+    let lastModalProduct = null;
+    let userRatings = {}; // {productName: rating}
+    let quizStep = 0;
+    let quizAnswers = [];
+
+    // --- DOM Elements ---
+    const productContainer = document.getElementById('productContainer');
+    const searchInput = document.getElementById('searchInput');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const priceFilter = document.getElementById('priceFilter');
+    const ratingFilter = document.getElementById('ratingFilter');
+    const rangeFilter = document.getElementById('rangeFilter');
+    const rangeValue = document.getElementById('rangeValue');
+    const cartCount = document.getElementById('cartCount');
+    const cartCountNum = document.getElementById('cartCountNum');
+    const cartDropdown = document.getElementById('cartDropdown');
+    const toast = document.getElementById('toast');
+    const sortSelect = document.getElementById('sortSelect');
+    const quizModal = document.getElementById('quizModal');
+    const quizQuestion = document.getElementById('quizQuestion');
+    const quizOptions = document.getElementById('quizOptions');
+    const quizResult = document.getElementById('quizResult');
+    const confettiDiv = document.getElementById('confetti');
+
+    // --- Helper Functions ---
+    function showToast(message, color = "var(--primary)", html = null) {
+      if (html) {
+        toast.innerHTML = html;
+      } else {
+        toast.textContent = message;
+      }
+      toast.style.background = color;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1800);
+    }
+
+    function updateCartCount() {
+      cartCountNum.textContent = cart.reduce((sum, item) => sum + item.qty, 0);
+    }
+
+    function updateCartDropdown() {
+      if (cart.length === 0) {
+        cartDropdown.innerHTML = `<div class="cart-empty">Your cart is empty.</div>`;
+        return;
+      }
+      let html = cart.map(item => `
+        <div class="cart-item">
+          <img src="${item.img}" alt="${item.name}">
+          <div class="cart-item-details">
+            <div style="font-weight:600;">${item.name}</div>
+            <div style="font-size:0.95rem;color:var(--primary);">₹${item.price} × ${item.qty}</div>
+          </div>
+          <span class="cart-item-remove" onclick="removeFromCart('${item.name}')"><i class="fa-solid fa-trash"></i></span>
+        </div>
+      `).join('');
+      const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+      html += `<div class="cart-total">Total: ₹${total}</div>
+        <button class="cart-checkout-btn" onclick="checkoutCart()">Checkout</button>`;
+      cartDropdown.innerHTML = html;
+    }
+
+    function removeFromCart(name) {
+      cart = cart.filter(item => item.name !== name);
+      updateCartCount();
+      updateCartDropdown();
+      showToast("Removed from cart", "var(--danger)");
+    }
+
+    function checkoutCart() {
+      showToast("Checkout successful! Thank you for shopping.", "var(--accent)");
+      cart = [];
+      updateCartCount();
+      updateCartDropdown();
+      cartDropdown.classList.remove('active');
+      launchConfetti();
+    }
+
+    cartCount.addEventListener('click', (e) => {
+      e.stopPropagation();
+      cartDropdown.classList.toggle('active');
+      updateCartDropdown();
+    });
+    document.body.addEventListener('click', () => {
+      cartDropdown.classList.remove('active');
+    });
+    cartDropdown.addEventListener('click', e => e.stopPropagation());
+
+    // --- Wishlist ---
+    function toggleWishlist(product) {
+      const idx = wishlist.findIndex(p => p.name === product.name);
+      if (idx === -1) {
+        wishlist.push(product);
+        showToast("Added to wishlist!", "var(--accent)");
+      } else {
+        wishlist.splice(idx, 1);
+        showToast("Removed from wishlist", "var(--accent-dark)");
+      }
+      displayProducts(getFilteredProducts());
+    }
+    function isWishlisted(product) {
+      return wishlist.some(p => p.name === product.name);
+    }
+
+    // --- Filtering & Sorting ---
+    function getFilteredProducts() {
+      let filtered = products.slice();
+      const category = categoryFilter.value;
+      const price = priceFilter.value;
+      const rating = parseFloat(ratingFilter.value);
+      const searchTerm = searchInput.value.trim().toLowerCase();
+      const maxPrice = parseInt(rangeFilter.value);
+
+      if (category) {
+        filtered = filtered.filter(p => p.category === category);
+      }
+      if (price === "low") {
+        filtered = filtered.filter(p => p.price < 1000);
+      } else if (price === "mid") {
+        filtered = filtered.filter(p => p.price >= 1000 && p.price <= 3000);
+      } else if (price === "high") {
+        filtered = filtered.filter(p => p.price > 3000);
+      }
+      if (rating) {
+        filtered = filtered.filter(p => p.rating >= rating);
+      }
+      if (searchTerm) {
+        filtered = filtered.filter(p =>
+          p.name.toLowerCase().includes(searchTerm) ||
+          (p.brand && p.brand.toLowerCase().includes(searchTerm)) ||
+          (p.desc && p.desc.toLowerCase().includes(searchTerm))
+        );
+      }
+      if (maxPrice < 15000) {
+        filtered = filtered.filter(p => p.price <= maxPrice);
+      }
+
+      // Sorting
+      switch (sortSelect.value) {
+        case "price-asc":
+          filtered.sort((a, b) => a.price - b.price);
+          break;
+        case "price-desc":
+          filtered.sort((a, b) => b.price - a.price);
+          break;
+        case "rating-desc":
+          filtered.sort((a, b) => b.rating - a.rating);
+          break;
+        case "name-asc":
+          filtered.sort((a, b) => a.name.localeCompare(b.name));
+          break;
+      }
+      return filtered;
+    }
+
+    function displayProducts(productList) {
+      productContainer.innerHTML = "";
+      if (productList.length === 0) {
+        productContainer.innerHTML = `<p style="grid-column:1/-1;text-align:center;font-size:1.2rem;color:var(--text-light);">No products found. Try changing your filters!</p>`;
+        return;
+      }
+      productList.forEach(product => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="card-badge">${product.badge || ""}</div>
+          <button class="wishlist-btn${isWishlisted(product) ? " active" : ""}" title="Add to Wishlist">
+            <i class="fa${isWishlisted(product) ? "-solid" : "-regular"} fa-heart"></i>
+          </button>
+          <img src="${product.img}" alt="${product.name}">
+          <div class="card-content">
+            <h4>${product.name}</h4>
+            <div class="desc">${product.desc}</div>
+            <div class="category"><i class="fa-solid fa-tag"></i> ${capitalize(product.category)} | <span style="color:var(--text-light);">${product.brand}</span></div>
+            <div class="price">₹${product.price} <span style="font-size:0.9em;color:var(--text-light);font-weight:400;">${product.stock <= 5 ? "(Few left!)" : ""}</span></div>
+            <div class="rating" data-product="${product.name}">${renderStars(userRatings[product.name] || product.rating, userRatings[product.name])} <span style="color:var(--text-main);font-size:0.98em;">${(userRatings[product.name] || product.rating).toFixed(1)}</span></div>
+            <button class="add-cart-btn"><i class="fa-solid fa-cart-plus"></i> Add to Cart</button>
+          </div>
+        `;
+        // Card events
+        card.querySelector('.add-cart-btn').addEventListener('click', (e) => {
+          e.stopPropagation();
+          addToCart(product);
+        });
+        card.querySelector('.wishlist-btn').addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleWishlist(product);
+        });
+        card.querySelector('img').addEventListener('click', () => openModal(product));
+        card.querySelector('h4').addEventListener('click', () => openModal(product));
+        // Interactive star rating
+        const ratingDiv = card.querySelector('.rating');
+        ratingDiv.addEventListener('click', (e) => {
+          if (e.target.classList.contains('fa-star') || e.target.classList.contains('fa-star-half-stroke')) {
+            const stars = Array.from(ratingDiv.querySelectorAll('.fa-star, .fa-star-half-stroke, .fa-regular.fa-star'));
+            const idx = stars.indexOf(e.target);
+            if (idx !== -1) {
+              userRatings[product.name] = idx + 1;
+              showToast(`You rated ${product.name} ${idx + 1}★!`, "var(--accent)");
+              displayProducts(getFilteredProducts());
+            }
+          }
+        });
+        productContainer.appendChild(card);
+      });
+    }
+
+    function capitalize(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    function renderStars(rating, highlight = null) {
+      let stars = '';
+      for (let i = 1; i <= 5; i++) {
+        let selected = highlight && i <= highlight ? " selected" : "";
+        if (rating >= i) stars += `<i class="fa-solid fa-star${selected}"></i>`;
+        else if (rating >= i - 0.5) stars += `<i class="fa-solid fa-star-half-stroke${selected}"></i>`;
+        else stars += `<i class="fa-regular fa-star${selected}"></i>`;
+      }
+      return stars;
+    }
+
+    // --- Cart Logic ---
+    function addToCart(product) {
+      const idx = cart.findIndex(item => item.name === product.name);
+      if (idx === -1) {
+        cart.push({ ...product, qty: 1 });
+      } else {
+        if (cart[idx].qty < product.stock) {
+          cart[idx].qty += 1;
+        } else {
+          showToast("No more stock available!", "var(--accent)");
+          return;
+        }
+      }
+      updateCartCount();
+      showToast("Added to cart!", "var(--primary)");
+      animateCartIcon();
+    }
+
+    // --- Modal Logic ---
+    function openModal(product) {
+      lastModalProduct = product;
+      document.getElementById("modalImg").src = product.img;
+      document.getElementById("modalName").textContent = product.name;
+      document.getElementById("modalDesc").textContent = product.desc;
+      document.getElementById("modalPrice").textContent = `₹${product.price}`;
+      document.getElementById("modalRating").innerHTML = `${renderStars(userRatings[product.name] || product.rating, userRatings[product.name])} <span style="color:var(--text-main);font-size:0.98em;">${(userRatings[product.name] || product.rating).toFixed(1)}</span>`;
+      document.getElementById("modalCategory").innerHTML = `<i class="fa-solid fa-tag"></i> ${capitalize(product.category)} | <span style="color:var(--text-light);">${product.brand}</span>`;
+      // Modal buttons
+      const modalAddCartBtn = document.getElementById("modalAddCartBtn");
+      modalAddCartBtn.onclick = function() { addToCart(product); };
+      const modalWishlistBtn = document.getElementById("modalWishlistBtn");
+      modalWishlistBtn.className = "wishlist-btn" + (isWishlisted(product) ? " active" : "");
+      modalWishlistBtn.innerHTML = `<i class="fa${isWishlisted(product) ? "-solid" : "-regular"} fa-heart"></i>`;
+      modalWishlistBtn.onclick = function() { toggleWishlist(product); updateModalWishlistBtn(); };
+      // Interactive star rating in modal
+      document.getElementById("modalRating").onclick = function(e) {
+        if (e.target.classList.contains('fa-star') || e.target.classList.contains('fa-star-half-stroke')) {
+          const stars = Array.from(document.getElementById("modalRating").querySelectorAll('.fa-star, .fa-star-half-stroke, .fa-regular.fa-star'));
+          const idx = stars.indexOf(e.target);
+          if (idx !== -1) {
+            userRatings[product.name] = idx + 1;
+            showToast(`You rated ${product.name} ${idx + 1}★!`, "var(--accent)");
+            openModal(product); // rerender modal
+            displayProducts(getFilteredProducts());
+          }
+        }
+      };
+      document.getElementById("productModal").style.display = "flex";
+    }
+    function updateModalWishlistBtn() {
+      if (!lastModalProduct) return;
+      const modalWishlistBtn = document.getElementById("modalWishlistBtn");
+      modalWishlistBtn.className = "wishlist-btn" + (isWishlisted(lastModalProduct) ? " active" : "");
+      modalWishlistBtn.innerHTML = `<i class="fa${isWishlisted(lastModalProduct) ? "-solid" : "-regular"} fa-heart"></i>`;
+    }
+    function closeModal() {
+      document.getElementById("productModal").style.display = "none";
+    }
+    window.closeModal = closeModal; // for inline onclick
+
+    // --- Filter Events ---
+    function applyFilters() {
+      displayProducts(getFilteredProducts());
+    }
+    searchInput.addEventListener("input", applyFilters);
+    categoryFilter.addEventListener("change", applyFilters);
+    priceFilter.addEventListener("change", applyFilters);
+    ratingFilter.addEventListener("change", applyFilters);
+    rangeFilter.addEventListener("input", () => {
+      rangeValue.textContent = "₹" + rangeFilter.value;
+      applyFilters();
+    });
+    sortSelect.addEventListener("change", applyFilters);
+
+    // --- Keyboard Shortcuts ---
+    document.addEventListener('keydown', (e) => {
+      if (e.key === "Escape") {
+        closeModal();
+        closeQuiz();
+      }
+      if (e.key === "/" && document.activeElement !== searchInput) {
+        e.preventDefault();
+        searchInput.focus();
+      }
+      // Easter egg: Press "w" to show wishlist
+      if (e.key === "w" && !quizModalIsOpen()) {
+        showWishlistToast();
+      }
+    });
+
+    // --- Initial Render ---
+    updateCartCount();
+    updateCartDropdown();
+    displayProducts(products);
+
+    // --- Demo: Welcome Toast ---
+    setTimeout(() => showToast("Welcome to ShopEase! 🎉", "var(--accent)"), 600);
+
+    // --- Easter Egg: Show wishlist on double click logo ---
+    function showWishlistToast() {
+      if (wishlist.length === 0) {
+        showToast("Your wishlist is empty!", "var(--accent)");
+        return;
+      }
+      let html = wishlist.map(p => `<div style="margin-bottom:0.5rem;"><b>${p.name}</b> <span style="color:var(--accent);">♥</span></div>`).join('');
+      showToast("", "var(--accent)", `<div style="font-weight:600;">Wishlist</div>${html}`);
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+    let logoClickCount = 0;
+    let logoClickTimer = null;
+    document.querySelector('.logo').addEventListener('click', () => {
+      logoClickCount++;
+      clearTimeout(logoClickTimer);
+      logoClickTimer = setTimeout(() => {
+        if (logoClickCount === 2) {
+          showWishlistToast();
+        } else if (logoClickCount >= 3) {
+          openQuiz();
+        }
+        logoClickCount = 0;
+      }, 350);
+    });
+
+    // --- Quiz Feature ---
+    function openQuiz() {
+      quizStep = 0;
+      quizAnswers = [];
+      quizResult.textContent = "";
+      quizModal.style.display = "flex";
+      showQuizStep();
+    }
+    function showQuizStep() {
+      const q = quizQuestions[quizStep];
+      quizQuestion.textContent = q.question;
+      quizOptions.innerHTML = "";
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.onclick = () => {
+          quizAnswers[quizStep] = opt;
+          Array.from(quizOptions.children).forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          setTimeout(() => {
+            quizStep++;
+            if (quizStep < quizQuestions.length) {
+              showQuizStep();
+            } else {
+              showQuizResult();
+            }
+          }, 350);
+        };
+        quizOptions.appendChild(btn);
+      });
+    }
+    function showQuizResult() {
+      // Recommend products based on quiz
+      let recs = products.filter(p => {
+        let match = true;
+        if (quizAnswers[0]) match = match && (capitalize(p.category) === quizAnswers[0]);
+        if (quizAnswers[1]) {
+          if (quizAnswers[1] === "Below ₹1000") match = match && (p.price < 1000);
+          else if (quizAnswers[1] === "₹1000 - ₹3000") match = match && (p.price >= 1000 && p.price <= 3000);
+          else if (quizAnswers[1] === "Above ₹3000") match = match && (p.price > 3000);
+        }
+        if (quizAnswers[2]) match = match && (p.badge === quizAnswers[2]);
+        return match;
+      });
+      if (recs.length === 0) {
+        recs = products.slice(0, 2);
+      }
+      quizOptions.innerHTML = recs.map(p =>
+        `<div style="margin-bottom:0.5rem;"><b>${p.name}</b> <span style="color:var(--accent);">${p.badge ? p.badge : ""}</span></div>`
+      ).join('');
+      quizQuestion.textContent = "Recommended for you!";
+      quizResult.innerHTML = `<span style="color:var(--primary);">${recs.length} product${recs.length>1?"s":""} matched your preferences.</span>`;
+      launchConfetti();
+    }
+    function closeQuiz() {
+      quizModal.style.display = "none";
+    }
+    function quizModalIsOpen() {
+      return quizModal.style.display === "flex";
+    }
+    window.closeQuiz = closeQuiz;
+
+    // --- Confetti Animation ---
+    function launchConfetti() {
+      confettiDiv.innerHTML = "";
+      const colors = ["var(--accent)", "var(--primary)", "var(--secondary)", "var(--surface)", "var(--secondary-light)"];
+      for (let i = 0; i < 32; i++) {
+        const conf = document.createElement("div");
+        conf.className = "confetti-piece";
+        conf.style.left = Math.random() * 100 + "vw";
+        conf.style.background = colors[Math.floor(Math.random() * colors.length)];
+        conf.style.animationDelay = (Math.random() * 0.7) + "s";
+        confettiDiv.appendChild(conf);
+      }
+      setTimeout(() => confettiDiv.innerHTML = "", 2200);
+    }
+
+    // --- Animate Cart Icon on Add ---
+    function animateCartIcon() {
+      cartCount.style.transform = "scale(1.15) rotate(-8deg)";
+      setTimeout(() => cartCount.style.transform = "", 220);
+    }
+
+    // --- Product of the Day (random) ---
+    function showProductOfTheDay() {
+      const p = products[Math.floor(Math.random() * products.length)];
+      showToast("", "var(--accent)", `<div style="font-weight:600;">Product of the Day</div>
+        <div style="margin:0.5rem 0;"><img src="${p.img}" alt="${p.name}" style="width:60px;height:60px;border-radius:8px;object-fit:cover;box-shadow:0 2px 8px var(--secondary-light);"></div>
+        <div><b>${p.name}</b> <span style="color:var(--accent);">${p.badge ? p.badge : ""}</span></div>
+        <div style="color:var(--primary);">₹${p.price}</div>
+      `);
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+    setTimeout(showProductOfTheDay, 3500);
+
+    // --- Fun: Show a random tip every 30s ---
+    const tips = [
+      "Tip: Double click the logo to view your wishlist!",
+      "Tip: Triple click the logo for a personalized quiz!",
+      "Tip: Press 'w' to quickly view your wishlist.",
+      "Tip: Click on stars to rate products!",
+      "Tip: Use the sort dropdown to organize products.",
+      "Tip: Try the Product of the Day for a surprise!"
+    ];
+    setInterval(() => {
+      showToast(tips[Math.floor(Math.random() * tips.length)], "var(--secondary-light)");
+    }, 30000);
+
+  </script>
+</body>
+</html>
